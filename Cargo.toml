@@ -1,0 +1,21 @@
+[package]
+name = "j1_tagged"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+name = "j1_tagged"
+path = "src/lib.rs"
+edition = "2018"
+
+[[bin]]
+name = "j1_tagged"
+path = "bin/j1_tagged.rs"
+
+[[bin]]
+name = "j1_tagged_dump"
+path = "bin/j1_tagged_dump.rs"
+
+[dependencies]
+byteorder = "1.3.4"
+clap = "2.33.3"
