@@ -41,6 +41,7 @@ impl Console {
 
     pub fn read_char(&mut self) -> char {
         let _r = self.reader.read_exact(&mut self.ar1);
+        // print!("{}", self.ar1[0] as char);
         self.ar1[0] as char
     }
 
