@@ -1,0 +1,191 @@
+# Goal: Populate with patterns with Forth words that are primatives and add picoSAFE featues
+#
+#  Element:
+#  31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╘══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪════ Literal Value
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  1  └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴────────── value 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╘══╧══╧══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪════ Jump Instruction
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  0  0  0  └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴────────── target address
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╘══╧══╧══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪════ Conditional Jump Instruction
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  0  0  1  └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴────────── target address
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╘══╧══╧══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪══╪════ Call Instruction
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  0  1  0  └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴────────── target address
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          ╞══╪══╪══╪══╪══╪══╪══╪════ Operations
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          │  │  │  │  │  │  ╘══╧═════════ dstack ±
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          |  |  |  |  |  |  0  0            noop
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          |  |  |  |  |  |  0  1            push
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          |  |  |  |  |  |  1  0            pop2
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          |  |  |  |  |  |  1  1            pop
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          │  │  │  │  ╘══╧═══════════════ rstack ±
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          |  |  |  |  0  0                  noop
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          |  |  |  |  0  1                  push
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          |  |  |  |  1  0                  pop2
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          |  |  |  |  1  1                  pop
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          │  │  │  └───────────────────── R → PC
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          │  │  └──────────────────────── N → [T]
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          │  └─────────────────────────── T → R
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                          └────────────────────────────── T → N
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │                         
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  0  1  1  ╘══╧══╧══╧══╧════════════════════════════ Tʹ opcodes
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  0  0  0                                   0) T   
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  0  0  1                                   1) N   
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  0  1  0                                   2) T+N 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  0  1  1                                   3) T∧N 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  1  0  0                                   4) T∨N 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  1  0  1                                   5) ⊕N 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  1  1  0                                   6) ¬T  
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  1  1  1                                   7) N=T 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  0  0  0                                   8) N<T 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  0  0  1                                   9) N≫T 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  0  1  0                                  10) T-1 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  0  1  1                                  11) R   
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  1  0  0                                  12) [T] 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  1  0  1                                  13) N≪T 
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  1  1  0                                  14) D   
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  0  1  1  1                                  15) Nu<T
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  0  0  0                                  16) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  0  0  1                                  17) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  0  1  0                                  18) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  0  1  1                                  19) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  1  0  0                                  20) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  1  0  1                                  21) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  1  1  0                                  22) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  1  1  1                                  23) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  0  0  0                                  24) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  0  0  1                                  25) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  0  1  0                                  26) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  0  1  1                                  27) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  1  0  0                                  28) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  1  0  1                                  29) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  1  1  0                                  30) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           0  1  1  1  1                                  31) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  0  0                                  32) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  0  1                                  33) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  1  0                                  34) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  1  1                                  35) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  0  0                                  36) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  0  1                                  37) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  1  0                                  38) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  1  1                                  39) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  0  0                                  40) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  0  1                                  41) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  1  0                                  42) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  1  1                                  43) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  0  0                                  44) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  0  1                                  45) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  1  0                                  46) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  1  1                                  47) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  0  0                                  48) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  0  1                                  49) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  1  0                                  50) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  1  1                                  51) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  0  0                                  52) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  0  1                                  53) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  1  0                                  54) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  1  1                                  55) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  0  0                                  56) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  0  1                                  57) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  1  0                                  58) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  0  1  1                                  59) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  0  0                                  60) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  0  1                                  61) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  1  0                                  62) Unused
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │           1  0  1  1  1                                  63) Unused
+
+
+#  SAFE Tag:
+#  31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+#   ║  Type  ║ Authority ║  Bound Start │ + 1024 ║
+#   ╚════════╩═══════════╩══════════════╧════════╩═══ SAFE tag
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │
+#   │  │  │  │  │  │  │  │  │  │  │  │  │  └──┴──┴──────────────────────────────────────────────────── Number of extra 1024 blocks 
+#   │  │  │  │  │  │  │  │  └──┴──┴──┴──┴───────────────────────────────────────────────────────────── Starting block address
+#   │  │  │  │  │  │  │  │                                                                           
+#   │  │  │  │  ╘══╧══╧══╧════════════════════════════════════════════════════════════════════════════ Authority Checking
+#   │  │  │  │  0  0  0  0                                                                                   0) Public
+#   │  │  │  │  0  0  0  1                                                                                   1) Mbuffer
+#   │  │  │  │  0  0  1  0                                                                                   2) Rbuffer
+#   │  │  │  │  0  1  1  1                                                                                   3) DcLm
+#   │  │  │  │  0  1  0  0                                                                                   4) DcAuthority
+#   │  │  │  │  0  1  0  1                                                                                   5) Bottom
+#   │  │  │  │  0  1  1  0                                                                                   6) Debug
+#   │  │  │  │  1  0  1  1                                                                                   7) Pass
+#   │  │  │  │  1  0  0  0                                                                                   8) Fail
+#   │  │  │  │  1  0  0  1                                                                                   9) Trace
+#   │  │  │  │  1  0  1  0                                                                                  10) Fatal
+#   │  │  │  │  1  1  1  1                                                                                  11) StringOnly
+#   │  │  │  │  1  1  0  0                                                                                  12) User0 (Unclassified)
+#   │  │  │  │  1  1  0  1                                                                                  13) User1 (Classified)
+#   │  │  │  │  1  1  1  0                                                                                  14) User2 (Secret)
+#   │  │  │  │  1  1  1  1                                                                                  15) User3 (Top Secret)
+#   │  │  │  │  
+#   ╘══╧══╧══╧════════════════════════════════════════════════════════════════════════════════════════ Type Checking
+#   0  0  0  0                                                                                               0) Uninitialized
+#   0  0  0  1                                                                                               1) Error
+#               # The following are warnings that do not abort:
+#               0  0  0  0  0  0                                                                                Warning: NP or DP not in RAM
+#               0  0  0  0  0  1                                                                                isn't unique
+#               # The following perform a COLD restart:
+#               0  0  0  0  1  0                                                                                Corrupted name list
+#               0  0  0  0  1  1                                                                                isn't in common ram
+#               #  the following print the word name at POCKET and the specified message:
+#               0  0  0  1  0  0                                                                                ?
+#               0  0  0  1  0  1                                                                                Page boundary was crossed
+#               0  0  0  1  1  0                                                                                Can't compile–Not RAM
+#               0  0  0  1  1  1                                                                                Compile mode only
+#               0  0  1  0  0  0                                                                                Word not found
+#               0  0  1  0  0  1                                                                                Data stack underflow
+#               0  0  1  0  1  0                                                                                Missing delimiter
+#               0  0  1  0  1  1                                                                                Not a number
+#               0  0  1  1  0  0                                                                                Unpaired control structures
+#               0  0  1  1  0  1                                                                                Invalid number of locals
+#               0  0  1  1  1  0                                                                                Invalid operand for TO
+#               0  0  1  1  1  1                                                                                Definition incomplete
+#               0  1  0  0  0  0                                                                                reserved
+#               0  1  0  0  0  1                                                                                Can't AXE–Name list changes page
+#               0  1  0  0  1  0                                                                                Can't load Block 0
+#               # the following is a stand-alone error message:
+#               0  1  0  0  1  1                                                                                Input exhausted
+#               # the following print the word name at POCKET and a parameter:
+#               0  1  0  1  0  0                                                                                is an invalid address mode
+#               0  1  0  1  0  1                                                                                is too large a branch offset
+#               0  1  0  1  1  0                                                                                is an invalid condition code
+#               0  1  0  1  1  1                                                                                is an invalid block number
+#               0  # The following print the name of the calling routine:
+#               0  1  1  0  0  0                                                                                incompatible vectors
+#               # The following print the name of the calling routine and a parameter:
+#               0  1  1  0  0  1                                                                                is an invalid parameter
+#               0  1  1  0  1  0                                                                                isn't in common ram
+#               # The following print the name of the calling routine and ARRAY'S.NAME:
+#               0  1  1  0  1  1                                                                                isn't dimensioned
+#               0  1  1  1  0  0                                                                                isn't a column vector
+#               0  1  1  1  0  1                                                                                isn't a matrix
+#               0  1  1  1  1  0                                                                                isn't square
+#               0  1  1  1  1  1                                                                                is too large. Not enough memory
+#               1  0  0  0  0  0                                                                                Doesn't have the specified row/column
+#               1  0  0  0  0  1                                                                                Incompatible sizes
+#               1  0  0  0  1  0                                                                                doesn't have 2 rows
+#               # the following prints the calling routine's name and array's.name and index:
+#               1  0  0  0  1  1                                                                                is an invalid number of dimensions
+#               1  0  0  1  0  0                                                                                is an out-of-range index
+#               # the following prints the calling routine's name and 2 array names:
+#               1  0  0  1  0  1                                                                                Incompatible sizes
+#   0  0  1  0                                                                                               2) Bool
+#   0  1  1  1                                                                                               3) Ratio
+#   0  1  0  0                                                                                               4) Unsigned
+#   0  1  0  1                                                                                               5) Integer
+#   0  1  1  0                                                                                               6) Float
+#   1  0  1  1                                                                                               7) Char
+#   1  0  0  0                                                                                               8) Authority
+#   1  0  0  1                                                                                               9) Instruction
+#   1  0  1  0                                                                                              10) InstructionPointer
+#   1  1  1  1                                                                                              11) FramePointer
+#   1  1  0  0                                                                                              12) ConstantFramePointer
+#   1  1  0  1                                                                                              13) LinearFramePointer
+#   1  1  1  0                                                                                              14) StreamReadPointer
+#   1  1  1  1                                                                                              15) StreamWritePointer

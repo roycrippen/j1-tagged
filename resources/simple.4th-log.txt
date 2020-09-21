@@ -3,3 +3,5 @@
 eforth j1 v1.04
 2 3 + .s
  5<tos ok
+. 5 ok
+ ok
