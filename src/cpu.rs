@@ -138,8 +138,8 @@ impl CPU {
             self.memory[(addr >> 1) as usize] = value;
         }
         match addr {
-            0x7000 => self.console.write_char(value as u8),  // key
-            0x7002 => return Err("bye".to_string()),         // bye
+            0x6010 => self.console.write_char(value as u8),  // key
+            0x6012 => return Err("bye".to_string()),         // bye
             _ => ()
         }
         Ok(())
@@ -150,8 +150,8 @@ impl CPU {
             return self.memory[(addr >> 1) as usize];
         }
         match addr {
-            0x7000 => self.console.read_char() as u16,  // tx!
-            0x7001 => 1,                                // ?rx returns 1 or 0
+            0x6010 => self.console.read_char() as u16,  // tx!
+            0x6011 => 1,                                // ?rx returns 1 or 0
             _ => 0 as u16 // error
         }
     }

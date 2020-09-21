@@ -51,27 +51,16 @@ pub enum Instruction {
     //  15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
     //   │  │  │  │  │  │  │  │  │  │  │  │  │  │  └──┴── dstack ±
     //   │  │  │  │  │  │  │  │  │  │  │  │  └──┴──────── rstack ±
-    //   │  │  │  │  │  │  │  │  │  │  │  └────────────── unused
+    //   │  │  │  │  │  │  │  │  │  │  │  └────────────── R → PC
     //   │  │  │  │  │  │  │  │  │  │  └───────────────── N → [T]
     //   │  │  │  │  │  │  │  │  │  └──────────────────── T → R
     //   │  │  │  │  │  │  │  │  └─────────────────────── T → N
-    //   │  │  │  │  └──┴──┴──┴────────────────────────── Tʹ
-    //   │  │  │  └────────────────────────────────────── R → PC
+    //   │  │  │  │  │  │  │  │
+    //   │  │  │  └──└──┴──┴──┴────────────────────────── t'
     //   └──┴──┴───────────────────────────────────────── 0 1 1
     //
     ALU(AluAttributes),
 }
-
-// pub fn decode(v: u16) -> Result<Instruction, String> {
-//     match v {
-//         v if v & (1 << 15) == 1 << 15 => Ok(Literal(v & !(1 << 15))),
-//         v if v & (7 << 13) == 0 => Ok(Jump(v & !(7 << 13))),
-//         v if v & (7 << 13) == 1 << 13 => Ok(Conditional(v & !(7 << 13))),
-//         v if v & (7 << 13) == 2 << 13 => Ok(Call(v & !(7 << 13))),
-//         v if v & (7 << 13) == 3 << 13 => Ok(ALU(decode_alu(v))),
-//         _ => Err(format!("Invalid Instruction: {:0>4x}", v)),
-//     }
-// }
 
 #[bitmatch]
 pub fn decode(v: u16) -> Result<Instruction, String> {
@@ -81,7 +70,7 @@ pub fn decode(v: u16) -> Result<Instruction, String> {
         "000a_aaaa_aaaa_aaaa" => Ok(Jump(a)),
         "001a_aaaa_aaaa_aaaa" => Ok(Conditional(a)),
         "010a_aaaa_aaaa_aaaa" => Ok(Call(a)),
-        "011a_bbbb_cde?_xxyy" => {
+        "011b_bbbb_cdea_xxyy" => {
             let alu_attributes = AluAttributes {
                 opcode: OpCode::from(b).unwrap(),
                 r2pc: a != 0,
@@ -96,19 +85,6 @@ pub fn decode(v: u16) -> Result<Instruction, String> {
         _ => Err(format!("Invalid Instruction: {:0>4x}", v)),
     }
 }
-
-// pub fn decode_alu(v: u16) -> AluAttributes {
-//     AluAttributes {
-//         opcode: OpCode::from((v >> 8) & 15).unwrap(),
-//         r2pc: v & (1 << 12) != 0,
-//         t2n: v & (1 << 7) != 0,
-//         t2r: v & (1 << 6) != 0,
-//         n2_at_t: v & (1 << 5) != 0,
-//         r_dir: EXPAND[((v >> 2) & 3) as usize],
-//         d_dir: EXPAND[((v >> 0) & 3) as usize],
-//     }
-// }
-
 
 impl Instruction {
     pub fn value(&self) -> u16 {
