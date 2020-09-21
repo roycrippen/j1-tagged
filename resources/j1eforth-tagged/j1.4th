@@ -4,7 +4,22 @@
       j1 Cross-compiler by James Bowman August 2010
      8086 eForth 1.0 by Bill Muench and C. H. Ting, 1990
 )
+(
+     moved R → PC flag from bit 12 to bit 4
 
+     so changed lines below: 
+     from 1000 -> 0001_0000_0000_0000
+     to     10 -> 0000_0000_0001_0000
+
+     from 7000 -> 0111_0000_0000_0000
+     to   6010 -> 0110_0000_0001_0000   
+
+     from 7001 -> 0111_0000_0000_0001
+     to   6011 -> 0110_0000_0001_0001   
+
+     from 7002 -> 0111_0000_0000_0010
+     to   6012 -> 0110_0000_0001_0010   
+)
 only forth definitions hex
 
 wordlist constant meta.1
@@ -78,7 +93,8 @@ a: r+1  0004 or ;
 
 a: alu  6000 or t, ;
 
-a: return [a] t 1000 or [a] r-1 [a] alu ;
+( a: return [a] t 1000 or [a] r-1 [a] alu ; )
+a: return [a] t 10 or [a] r-1 [a] alu ;
 a: branch 2/ 0000 or t, ;
 a: ?branch 2/ 2000 or t, ;
 a: call 2/ 4000 or t, ;
@@ -135,7 +151,8 @@ variable tuser
 : call? lookback e000 and 4000 = ;
 : call>goto there =cell - dup t@ 1fff and swap t! ;
 : safe? lookback e000 and 6000 = lookback 004c and 0= and ;
-: alu>return there =cell - dup t@ 1000 or [a] r-1 swap t! ;
+( : alu>return there =cell - dup t@ 1000 or [a] r-1 swap t! ; )
+: alu>return there =cell - dup t@ 10 or [a] r-1 swap t! ;
 : t:
   >in @ thead >in !
     get-current >r target.1 set-current create
@@ -247,7 +264,7 @@ a: up e for up1 next noop exit ;
 =pick org
 
     ]asm down up asm[
-
+	
 there constant =pickbody
 
 	copy ]asm return asm[
@@ -350,7 +367,8 @@ t: 2* 1 literal lshift t;
 t: 1+ 1 literal + t;
 t: sp@ dsp ff literal and t;
 t: execute ( ca -- ) >r t;
-t: bye ( -- ) 7002 literal ! t;
+( t: bye 7002 literal ! t; )
+t: bye ( -- ) 6012 literal ! t;
 t: c@ ( b -- c )
   dup @ swap 1 literal and if
    8 literal rshift else ff literal and then exit t;
@@ -493,17 +511,21 @@ t: number? ( a -- n t | a f )
      else r> r> 2drop 2drop 0 literal
       then dup
    then r> 2drop r> base ! t;
-t: ?rx ( -- c t | f ) 7001 literal @ 1 literal and 0= invert t;
+( t: ?rx 7001 literal @ 1 literal and 0= invert t; )
+t: ?rx ( -- c t | f ) 6011 literal @ 1 literal and 0= invert t;
 t: tx! ( c -- )
    begin
-    7001 literal @ 2 literal and 0=
-   until 7000 literal ! t;
+(   7001 literal @ 2 literal and 0= )
+    6011 literal @ 2 literal and 0=
+(   until 7000 literal ! t; )
+   until 6010 literal ! t;
 t: ?key ( -- c ) '?key @execute t;
 t: emit ( c -- ) 'emit @execute t;
 t: key ( -- c )
     begin
      ?key
-	until 7000 literal @ t;
+(   until 7000 literal @ t; )
+	until 6010 literal @ t;
 t: nuf? ( -- t ) ?key dup if drop key =nl literal = then exit t;
 t: space ( -- ) bl emit t;
 t: spaces ( +n -- ) 0 literal max  for aft space then next t;
@@ -695,7 +717,7 @@ t: endcase
    begin
     dup 31 literal =
    while
-    drop
+    drop			
     [t] then ]asm call asm[
    repeat
    30 literal <> <?abort"> $literal bad case construct."
@@ -755,8 +777,8 @@ t: does> ( -- ) compile (does>) noop t; immediate
 t: char ( <char> -- char ) ( -- c ) bl word 1+ c@ t;
 t: [char] char [t] literal ]asm call asm[ t; immediate
 t: constant create , (does>) @ t;
-t: defer create 0 literal ,
-   (does>)
+t: defer create 0 literal , 
+   (does>) 
     @ ?dup 0 literal =
    <?abort"> $literal uninitialized" execute t;
 t: is ' >body ! t; immediate
