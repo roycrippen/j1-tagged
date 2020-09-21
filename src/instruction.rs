@@ -91,11 +91,6 @@ pub fn decode(v: u16) -> Result<Instruction, String> {
                 r_dir: EXPAND[x as usize],
                 d_dir: EXPAND[y as usize],
             };
-            if a != 0  {
-                // println!("{:?}", alu_attributes)
-                println!("{:?}", alu_attributes)
-            }
-
             Ok(ALU(alu_attributes))
         }
         _ => Err(format!("Invalid Instruction: {:0>4x}", v)),
