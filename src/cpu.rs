@@ -233,7 +233,7 @@ mod tests {
     use crate::instruction::Instruction::{ALU, Call, Conditional, Jump, Literal};
     use crate::instruction::OpCode::*;
     use crate::utils::read_binary;
-    use crate::j1e_bin;
+    use crate::j1_bytes;
 
     fn load_binary() -> CPU {
         let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -250,7 +250,7 @@ mod tests {
     #[test]
     fn dump_asm() {
         let mut cpu = CPU::new();
-        cpu.load_bytes(&j1e_bin::J1E_BIN.to_vec()).unwrap();
+        cpu.load_bytes(&j1_bytes::J1_BYTES.to_vec()).unwrap();
         let xs = cpu.dump_asm(0x00C2, 0x00C4);
         // for x in xs.clone().iter() {
         //     println!("{}", x)
@@ -266,7 +266,7 @@ mod tests {
     #[test]
     fn dump_ast() {
         let mut cpu = CPU::new();
-        cpu.load_bytes(&j1e_bin::J1E_BIN.to_vec()).unwrap();
+        cpu.load_bytes(&j1_bytes::J1_BYTES.to_vec()).unwrap();
         let xs = cpu.dump_ast(0x00C2, 0x00C4);
         // for x in xs.clone().iter() {
         //     println!("{}", x)
@@ -283,7 +283,7 @@ mod tests {
     #[test]
     fn run() {
         let mut cpu = CPU::new();
-        cpu.load_bytes(&j1e_bin::J1E_BIN.to_vec()).unwrap();
+        cpu.load_bytes(&j1_bytes::J1_BYTES.to_vec()).unwrap();
 
         cpu.run(b"2 3 * .\n".to_vec()).unwrap();
         let s = cpu.console.get_log();

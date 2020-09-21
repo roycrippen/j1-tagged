@@ -3,7 +3,7 @@ extern crate clap;
 use std::ffi::OsString;
 use clap::{App, Arg};
 use j1_tagged::cpu::CPU;
-use j1_tagged::j1e_bin;
+use j1_tagged::j1_bytes;
 use j1_tagged::utils::{read_binary, read_forth_source, write_log_file};
 use std::io;
 
@@ -27,7 +27,7 @@ fn main() -> std::io::Result<()> {
     let mut binary: Vec<u8> = Vec::new();
     if args.bin_file_name.len() == 0 {
         println!("loaded j1e binary");
-        binary = j1e_bin::J1E_BIN.to_vec();
+        binary = j1_bytes::J1_BYTES.to_vec();
     } else {
         println!("loaded binary: {}", args.bin_file_name);
         binary = read_binary(&args.bin_file_name)?;
