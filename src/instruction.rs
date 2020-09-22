@@ -70,7 +70,11 @@ pub fn decode(v: u16) -> Result<Instruction, String> {
         "000a_aaaa_aaaa_aaaa" => Ok(Jump(a)),
         "001a_aaaa_aaaa_aaaa" => Ok(Conditional(a)),
         "010a_aaaa_aaaa_aaaa" => Ok(Call(a)),
-        "011b_bbbb_cdea_xxyy" => {
+        "011?_bbbb_cdea_xxyy" => {
+            let opcode = OpCode::from(b);
+            if opcode == None {
+                return Err(format!("Invalid opcode for ALU instruction: {:0>4x}", v))
+            }
             let alu_attributes = AluAttributes {
                 opcode: OpCode::from(b).unwrap(),
                 r2pc: a != 0,

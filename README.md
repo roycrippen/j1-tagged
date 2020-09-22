@@ -13,9 +13,8 @@ Help with executable arguments `<executable> -h` or `<executable> --help` <br>
 
 | Name                        |Description |
 | :-------------------------  | :------ |
-| j1                          | j1 emulator |
-| j1_dump                     | dump j1 cpu memory in assembly or instruction AST format |
-| j1_example_compile_and_dump | example of programmatically using j1 |
+| j1_tagged                          | j1 emulator |
+| j1_tagged_dump                     | dump j1 cpu memory in assembly or instruction AST format |
 
 ### test
 ```shell
@@ -28,20 +27,20 @@ $ cargo doc
 # open j1-cpu/target/doc/j1/index.html with browser
 ```
 
-### run j1 eforth repl
+### run j1_tagged eforth repl
 ```shell
 # option -r or --repl
-$ j1 --repl
+$ j1_tagged --repl
 ```
 
-### run j1 eforth repl with a script
+### run j1_tagged eforth repl with a script
 ```shell
 # from j1-cpu directory
 $ cd resources
-$ j1 --repl --script simple.fth
+$ j1_tagged --repl --script simple.fth
 ```
 
-### j1 options
+### j1_tagged options
 ```shell
 # help -h or --help
 # Note: results saved to <script_file>-log.txt if not running repl
@@ -66,14 +65,16 @@ OPTIONS:
 
 
 ### todo
-| Task                        | Done |
-| :------------------------   | :------: |
-| stack                       | &#x2714; |
-| instructions                | &#x2714; |
-| cpu                         | &#x2714; |
-| dump memory to asm and ast  | &#x2714; |
-| j1 emulator                 | &#x2714; |
-| arguments for j1 executable | &#x2714; |
-| j1 gRPC service             |  |
-| test with swap forth        |  |
-| add verbosity levels        |  |
+| Task                           | Done |
+| :---------------------------   | :------: |
+| stack                          | &#x2714; |
+| instructions                   | &#x2714; |
+| cpu                            | &#x2714; |
+| dump memory to asm and ast     | &#x2714; |
+| j1 emulator                    | &#x2714; |
+| arguments for j1 executable    | &#x2714; |
+| j1 gRPC service                | &#x2714; |
+| move R->PC to bit 4            | &#x2714; |
+| allow 5 bit opcodes            |  |
+| implement 32 bit tagged memory |  |
+| add verbosity levels           |  |
