@@ -83,7 +83,7 @@ impl Args {
             .long("bin") // allow --bin
             .short("b") // allow -b
             .takes_value(true)
-            .help("Binary J1 forth image to load, default is j1e.bin")
+            .help("Binary J1 forth image to load, default is j1_bytes::J1_BYTES")
             .required(false);
 
         // define the forth script file name command line option

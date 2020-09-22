@@ -238,7 +238,7 @@ mod tests {
     fn load_binary() -> CPU {
         let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         p.push("resources");
-        p.push("j1e.bin");
+        p.push("j1.bin");
         let full_file_name = p.display().to_string();
 
         let mut cpu = CPU::new();
@@ -246,6 +246,14 @@ mod tests {
         cpu
     }
 
+    #[test]
+    fn compare_bins() {
+        let mut cpu1 = CPU::new();
+        cpu1.load_bytes(&j1_bytes::J1_BYTES.to_vec()).unwrap();
+
+        let cpu2 = load_binary();
+        assert_eq!(cpu1.memory, cpu2.memory);
+    }
 
     #[test]
     fn dump_asm() {
