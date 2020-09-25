@@ -3,7 +3,7 @@ extern crate clap;
 use std::ffi::OsString;
 use clap::{App, Arg};
 use j1_tagged::cpu::CPU;
-use j1_tagged::j1_bytes;
+use j1_tagged::j1e_bytes;
 use j1_tagged::utils::{read_binary, read_forth_source, write_log_file};
 use std::io;
 
@@ -27,7 +27,7 @@ fn main() -> std::io::Result<()> {
     let mut binary: Vec<u8> = Vec::new();
     if args.bin_file_name.len() == 0 {
         println!("loaded j1e binary");
-        binary = j1_bytes::J1_BYTES.to_vec();
+        binary = j1e_bytes::J1E_BYTES.to_vec();
     } else {
         println!("loaded binary: {}", args.bin_file_name);
         binary = read_binary(&args.bin_file_name)?;
@@ -94,9 +94,9 @@ impl Args {
             T: Into<OsString> + Clone,
     {
         // basic app information
-        let app = App::new("j1")
+        let app = App::new("j1_tagged")
             .version("1.0")
-            .about("J1 cpu emulator")
+            .about("J1_tagged cpu emulator")
             .author("Roy Crippen");
 
         // define the binary file name command line option
@@ -104,7 +104,7 @@ impl Args {
             .long("bin") // allow --bin
             .short("b") // allow -b
             .takes_value(true)
-            .help("Binary J1 forth image to load, default is j1e.bin")
+            .help("Binary J1 forth image to load, default is j1e_bytes::J1E_BYTES")
             .required(false);
 
         // define the forth script file name command line option

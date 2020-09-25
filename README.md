@@ -35,23 +35,22 @@ $ j1_tagged --repl
 
 ### run j1_tagged eforth repl with a script
 ```shell
-# from j1-cpu directory
-$ cd resources
-$ j1_tagged --repl --script simple.fth
+# from j1-tagged directory
+$ j1_tagged --repl --script resources/simple.4th
 ```
 
 ### j1_tagged options
 ```shell
 # help -h or --help
 # Note: results saved to <script_file>-log.txt if not running repl
-$ j1 -h
+$ j1_tagged -h
 
-j1 1.0
+j1_tagged 1.0
 Roy Crippen
-J1 cpu emulator
+J1_tagged cpu emulator
 
 USAGE:
-    j1 [FLAGS] [OPTIONS]
+    j1_tagged [FLAGS] [OPTIONS]
 
 FLAGS:
     -h, --help       Prints help information
@@ -59,7 +58,7 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -b, --bin <bin_file>          Binary J1 forth imamge to load
+    -b, --bin <bin_file>          Binary J1 forth image to load, default is j1e_bytes::J1E_BYTES
     -s, --script <script_file>    Forth script file to load and execute
 ```
 

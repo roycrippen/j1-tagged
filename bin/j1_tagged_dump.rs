@@ -6,7 +6,7 @@ use std::io::{Error, ErrorKind};
 use clap::{App, Arg};
 
 use j1_tagged::cpu::CPU;
-use j1_tagged::j1_bytes;
+use j1_tagged::j1e_bytes;
 use j1_tagged::utils::{read_binary, read_forth_source};
 
 #[allow(unused_assignments)]
@@ -23,7 +23,7 @@ fn main() -> std::io::Result<()> {
     // read a j1 binary file
     let mut binary: Vec<u8> = Vec::new();
     if args.bin_file_name.len() == 0 {
-        binary = j1_bytes::J1_BYTES.to_vec();
+        binary = j1e_bytes::J1E_BYTES.to_vec();
     } else {
         binary = read_binary(&args.bin_file_name)?;
     }

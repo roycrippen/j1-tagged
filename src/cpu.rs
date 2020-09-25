@@ -18,13 +18,13 @@ pub const MEMORY_SIZE: usize = 0x4000;
 ///
 /// ```
 /// use j1_tagged::cpu::CPU;
-/// use j1_tagged::j1e_bin;
+/// use j1_tagged::j1e_bytes;
 ///
 /// // create a new CPU
 /// let mut cpu = CPU::new();
 ///
 /// // load a binary Forth os
-/// cpu.load_bytes(&j1e_bin::J1E_BIN.to_vec()).unwrap();
+/// cpu.load_bytes(&j1e_bytes::J1E_BYTES.to_vec()).unwrap();
 ///
 /// // run a Forth script
 /// cpu.run(b"2 3 * .\n".to_vec()).unwrap();
@@ -233,7 +233,7 @@ mod tests {
     use crate::instruction::Instruction::{ALU, Call, Conditional, Jump, Literal};
     use crate::instruction::OpCode::*;
     use crate::utils::read_binary;
-    use crate::j1_bytes;
+    use crate::j1e_bytes;
 
     fn load_binary() -> CPU {
         let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -249,23 +249,25 @@ mod tests {
     #[test]
     fn compare_bins() {
         let mut cpu1 = CPU::new();
-        cpu1.load_bytes(&j1_bytes::J1_BYTES.to_vec()).unwrap();
+        cpu1.load_bytes(&j1e_bytes::J1E_BYTES.to_vec()).unwrap();
 
         let cpu2 = load_binary();
-        assert_eq!(cpu1.memory, cpu2.memory);
-    }
+        assert_eq!(cpu1.memory.len(), cpu2.memory.len());
+        for i in 0..cpu1.memory.len() {
+            assert_eq!(cpu1.memory[i], cpu2.memory[i]);
+        }    }
 
     #[test]
     fn dump_asm() {
         let mut cpu = CPU::new();
-        cpu.load_bytes(&j1_bytes::J1_BYTES.to_vec()).unwrap();
+        cpu.load_bytes(&j1e_bytes::J1E_BYTES.to_vec()).unwrap();
         let xs = cpu.dump_asm(0x00C2, 0x00C4);
         // for x in xs.clone().iter() {
         //     println!("{}", x)
         // }
         let expected = vec![
             "Address,Value,Instruction",
-            "0x00C2,0x700C,ALU     T R→PC r-1",
+            "0x00C2,0x601C,ALU     T R→PC r-1",
             "0x00C4,0x404E,CALL    009C",
         ];
         assert_eq!(expected, xs);
@@ -274,14 +276,14 @@ mod tests {
     #[test]
     fn dump_ast() {
         let mut cpu = CPU::new();
-        cpu.load_bytes(&j1_bytes::J1_BYTES.to_vec()).unwrap();
+        cpu.load_bytes(&j1e_bytes::J1E_BYTES.to_vec()).unwrap();
         let xs = cpu.dump_ast(0x00C2, 0x00C4);
         // for x in xs.clone().iter() {
         //     println!("{}", x)
         // }
         let expected = vec![
             "Address,Value,Instruction",
-            "0x00C2,0x700C,Instruction::ALU(AluAttributes { opcode: OpT, r2pc: true, t2n: false, t2r: false, n2_at_t: false, r_dir: -1, d_dir: 0 })",
+            "0x00C2,0x601C,Instruction::ALU(AluAttributes { opcode: OpT, r2pc: true, t2n: false, t2r: false, n2_at_t: false, r_dir: -1, d_dir: 0 })",
             "0x00C4,0x404E,Instruction::Call(0x004E)",
         ];
         assert_eq!(expected, xs);
@@ -291,7 +293,7 @@ mod tests {
     #[test]
     fn run() {
         let mut cpu = CPU::new();
-        cpu.load_bytes(&j1_bytes::J1_BYTES.to_vec()).unwrap();
+        cpu.load_bytes(&j1e_bytes::J1E_BYTES.to_vec()).unwrap();
 
         cpu.run(b"2 3 * .\n".to_vec()).unwrap();
         let s = cpu.console.get_log();
@@ -330,10 +332,10 @@ mod tests {
         // cpu.console.load(&mut cmds);
 
         // 0x7000 => tx!,  0x7001 => ?rx
-        assert_eq!(1, cpu.read_at(0x7001));
-        assert_eq!('1' as u16, cpu.read_at(0x7000));
-        assert_eq!(' ' as u16, cpu.read_at(0x7000));
-        assert_eq!('2' as u16, cpu.read_at(0x7000));
+        assert_eq!(1, cpu.read_at(0x6011));
+        assert_eq!('1' as u16, cpu.read_at(0x6010));
+        assert_eq!(' ' as u16, cpu.read_at(0x6010));
+        assert_eq!('2' as u16, cpu.read_at(0x6010));
     }
 
     #[test]

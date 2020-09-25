@@ -15,6 +15,6 @@ for line in lines:
 
 rust_str += '\n];'
 
-file1 = open('j1_bytes.rs', 'w')
+file1 = open('j1e_bytes.rs', 'w')
 file1.write(rust_str)
 file1.close()
