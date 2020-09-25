@@ -36,7 +36,7 @@ $ j1_tagged --repl
 ### run j1_tagged eforth repl with a script
 ```shell
 # from j1-tagged directory
-$ j1_tagged --repl --script resources/simple.4th
+$ j1_tagged --repl --script resources/fib.4th
 ```
 
 ### j1_tagged options
